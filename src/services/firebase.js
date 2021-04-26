@@ -19,7 +19,7 @@ export async function getUserByUsername(username) {
 
   return result.docs.map((item) => ({
     ...item.data(),
-    docId: item.docId,
+    docId: item.id,
   }));
 }
 
@@ -29,7 +29,6 @@ export async function getUserByUserId(userId) {
     .collection('users')
     .where('userId', '==', userId)
     .get();
-
   const user = result.docs.map((item) => ({
     ...item.data(),
     docId: item.id,
@@ -40,6 +39,7 @@ export async function getUserByUserId(userId) {
 
 export async function getSuggestedProfiles(userId, following) {
   const result = await firebase.firestore().collection('users').limit(10).get();
+
   return result.docs
     .map((user) => ({ ...user.data(), docId: user.id }))
     .filter(
@@ -98,9 +98,7 @@ export async function getPhotos(userId, following) {
       if (photo.likes.includes(userId)) {
         userLikedPhoto = true;
       }
-
       const user = await getUserByUserId(photo.userId);
-
       const { username } = user[0];
       return { username, ...photo, userLikedPhoto };
     })
@@ -140,4 +138,24 @@ export async function isUserFollowingProfile(
   }));
 
   return response.userId;
+}
+
+export async function toggleFollow(
+  isFollowingProfile,
+  activeUserDocId,
+  profileDocId,
+  profileUserId,
+  followingUserId
+) {
+  await updateLoggedInUserFollowing(
+    activeUserDocId,
+    profileUserId,
+    isFollowingProfile
+  );
+
+  await updateFollowedUserFollowers(
+    profileDocId,
+    followingUserId,
+    isFollowingProfile
+  );
 }
