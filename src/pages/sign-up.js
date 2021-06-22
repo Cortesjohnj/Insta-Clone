@@ -49,6 +49,7 @@ export default function SignUp() {
         setError(error.message);
       }
     } else {
+      setUsername('');
       setError('That username is already taken, please try another.');
     }
   };
@@ -87,7 +88,7 @@ export default function SignUp() {
               value={username}
             />
             <input
-              aria-label="Enter your full Name"
+              aria-label="Enter your full name"
               type="text"
               placeholder="Full Name"
               className="text-sm text-gray-base w-full mr-3 py-5 px-4 h-2 border border-gray-primary rounded mb-2"
